@@ -1,0 +1,19 @@
+{
+  "scripts": {
+    "dev": "wrangler pages dev public",
+    "deploy": "wrangler pages deploy public --project-name qr-edge"
+  },
+  "devDependencies": {
+    "wrangler": "^4.86.0"
+  },
+  "name": "throffling-qr",
+  "version": "1.0.0",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "qrcode-generator": "^2.0.4"
+  }
+}

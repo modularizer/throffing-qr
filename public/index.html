@@ -1,0 +1,333 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>QR Generator</title>
+    <link id="favicon" rel="icon" href="" />
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 520px; margin: 48px auto; padding: 20px; }
+        input { width: 100%; font-size: 18px; padding: 12px; box-sizing: border-box; }
+        img { width: 280px; height: 280px; margin-top: 24px; }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .control-group label {
+            font-weight: 500;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .control-group input[type="color"] {
+            width: 100%;
+            height: 40px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .control-group input[type="range"] {
+            width: 100%;
+        }
+
+        .control-group input[type="checkbox"] {
+            cursor: pointer;
+        }
+
+        .range-value {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .toggle-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0;
+            margin-bottom: 12px;
+        }
+
+        .controls {
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+            padding: 12px;
+            background: #f5f5f5;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .controls.open {
+            display: grid;
+        }
+
+        .qr-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            max-width: 100%;
+            margin-top: 16px;
+            color: #444;
+            text-decoration: none;
+        }
+
+        .qr-link code {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .qr-link:hover {
+            text-decoration: underline;
+        }
+
+        .qr-link .icon {
+            width: 14px;
+            height: 14px;
+            flex: 0 0 auto;
+        }
+
+        .links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>QR Generator</h1>
+    <button class="toggle-btn" id="toggleBtn">⚙️</button>
+</div>
+<input id="link" placeholder="google.com" autofocus />
+
+<div class="controls" id="controls">
+    <div class="control-group">
+        <label for="darkColor">Dark Color</label>
+        <input type="color" id="darkColor" value="#000000">
+    </div>
+    <div class="control-group">
+        <label for="lightColor">Light Color</label>
+        <input type="color" id="lightColor" value="#FFFFFF">
+    </div>
+    <div class="control-group">
+        <label for="margin">Margin: <span class="range-value" id="marginValue">1</span></label>
+        <input type="range" id="margin" min="0" max="10" value="1">
+    </div>
+    <div class="control-group">
+        <label for="size">Size: <span class="range-value" id="sizeValue">280</span>px</label>
+        <input type="range" id="size" min="100" max="500" value="280" step="10">
+    </div>
+    <div class="control-group">
+        <label for="shadow">
+            <input type="checkbox" id="shadow"> Drop Shadow
+        </label>
+    </div>
+    <div class="control-group">
+        <button id="resetBtn" style="padding: 8px 12px; font-size: 14px; cursor: pointer; background: #ddd; border: none; border-radius: 4px;">Reset Styles</button>
+    </div>
+</div>
+
+<div id="preview" hidden>
+    <img id="qr" alt="QR code" style="width: 280px; height: 280px; margin-top: 24px;" />
+    <div class="links">
+        <a id="qrImgLink" class="qr-link" target="_blank">
+            <code id="qrUrl"></code>
+            <svg class="icon" viewBox="0 0 24 24" fill="none">
+                <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" stroke="currentColor" stroke-width="2"/>
+            </svg>
+        </a>
+
+        <a id="qrDestLink" class="qr-link" target="_blank" rel="noopener noreferrer">
+            <code id="destUrl"></code>
+            <svg class="icon" viewBox="0 0 24 24" fill="none">
+                <path d="M14 5h5v5M10 14L19 5M19 14v4a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h4"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        </a>
+    </div>
+</div>
+
+<script>
+    const input = document.getElementById("link")
+    const preview = document.getElementById("preview")
+    const img = document.getElementById("qr")
+    const qrUrl = document.getElementById("qrUrl")
+    const favicon = document.getElementById("favicon")
+    const qrImgLink = document.getElementById("qrImgLink")
+    const qrDestLink = document.getElementById("qrDestLink")
+    const destUrl = document.getElementById("destUrl")
+    const darkColor = document.getElementById("darkColor")
+    const lightColor = document.getElementById("lightColor")
+    const margin = document.getElementById("margin")
+    const size = document.getElementById("size")
+    const marginValue = document.getElementById("marginValue")
+    const sizeValue = document.getElementById("sizeValue")
+    const shadow = document.getElementById("shadow")
+
+    function clean(raw) {
+        return raw.trim().replace(/^https?:\/\//i, "")
+    }
+
+    function update() {
+        if (typeof QRCode === "undefined") {
+            setTimeout(update, 50)
+            return
+        }
+
+        const rawInput = input.value.trim()
+        const isExplicitHttp = /^http:\/\//i.test(rawInput)
+        const value = clean(rawInput)
+
+        if (!value) {
+            preview.hidden = true
+            document.title = "QR Generator"
+            history.replaceState(null, "", "/")
+            return
+        }
+
+        const pagePath = "/" + value
+        const targetUrl = isExplicitHttp ? rawInput : "https://" + value
+        const qrSize = parseInt(size.value)
+
+        // Build search params for style customization
+        const params = new URLSearchParams()
+        const darkHex = darkColor.value.substring(1).toUpperCase()
+        const lightHex = lightColor.value.substring(1).toUpperCase()
+        const marginVal = parseInt(margin.value)
+
+        // Only add params if they differ from defaults
+        if (darkHex !== "000000") params.append("dark", darkHex)
+        if (lightHex !== "FFFFFF") params.append("light", lightHex)
+        if (marginVal !== 1) params.append("margin", marginVal)
+        if (qrSize !== 280) params.append("size", qrSize)
+        if (shadow.checked) params.append("shadow", "true")
+
+        const queryString = params.toString()
+        const fullPath = queryString ? pagePath + "?" + queryString : pagePath
+
+        // Generate QR code client-side for preview
+        const canvas = document.createElement("canvas")
+        QRCode.toCanvas(canvas, targetUrl, {
+            width: qrSize,
+            margin: marginVal,
+            color: {
+                dark: darkColor.value,
+                light: lightColor.value
+            }
+        }, function (error) {
+            if (error) {
+                console.error("QR generation error:", error)
+                return
+            }
+            const qrDataUrl = canvas.toDataURL("image/png")
+
+            img.src = qrDataUrl
+            img.style.width = qrSize + "px"
+            img.style.height = qrSize + "px"
+            img.style.boxShadow = shadow.checked ? "0 4px 12px rgba(0, 0, 0, 0.15)" : "none"
+            favicon.href = qrDataUrl
+
+            // Edge worker URL
+            const edgeWorkerUrl = "/" + value + ".svg" + (queryString ? "?" + queryString : "")
+            qrUrl.textContent = location.origin + edgeWorkerUrl
+
+            qrImgLink.href = location.origin + edgeWorkerUrl
+            qrDestLink.href = targetUrl
+            destUrl.textContent = targetUrl
+
+            preview.hidden = false
+        })
+
+        try {
+            document.title = new URL(targetUrl).origin
+        } catch {
+            document.title = "QR Generator"
+        }
+
+        if (location.pathname !== pagePath || location.search !== (queryString ? "?" + queryString : "")) {
+            history.replaceState(null, "", fullPath)
+        }
+    }
+
+    // Update value displays and regenerate QR on style changes
+    margin.addEventListener("input", (e) => {
+        marginValue.textContent = e.target.value
+        update()
+    })
+
+    size.addEventListener("input", (e) => {
+        sizeValue.textContent = e.target.value
+        update()
+    })
+
+    shadow.addEventListener("change", update)
+
+    darkColor.addEventListener("input", update)
+    lightColor.addEventListener("input", update)
+
+    // Toggle controls visibility
+    document.getElementById("toggleBtn").addEventListener("click", () => {
+        document.getElementById("controls").classList.toggle("open")
+    })
+
+    // Reset button
+    document.getElementById("resetBtn").addEventListener("click", () => {
+        darkColor.value = "#000000"
+        lightColor.value = "#FFFFFF"
+        margin.value = "1"
+        marginValue.textContent = "1"
+        size.value = "280"
+        sizeValue.textContent = "280"
+        shadow.checked = false
+        history.replaceState(null, "", "/")
+        update()
+    })
+
+    // Load initial values from URL search params
+    const params = new URLSearchParams(location.search)
+    if (params.has("dark")) darkColor.value = "#" + params.get("dark")
+    if (params.has("light")) lightColor.value = "#" + params.get("light")
+    if (params.has("margin")) {
+        margin.value = params.get("margin")
+        marginValue.textContent = margin.value
+    }
+    if (params.has("size")) {
+        size.value = params.get("size")
+        sizeValue.textContent = size.value
+    }
+    if (params.has("shadow")) {
+        shadow.checked = true
+    }
+
+    let initial = location.pathname.slice(1)
+    if (initial && !initial.endsWith(".svg") && !initial.endsWith(".png")) {
+        input.value = decodeURIComponent(initial)
+    }
+
+    input.addEventListener("input", update)
+    update()
+</script>
+</body>
+</html>
