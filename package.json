@@ -6,7 +6,7 @@
   "devDependencies": {
     "wrangler": "^4.86.0"
   },
-  "name": "throffling-qr",
+  "name": "throffing-qr",
   "version": "1.0.0",
   "main": "index.js",
   "keywords": [],

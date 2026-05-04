@@ -1,8 +1,8 @@
-# Throffling QR
+# Throffing QR
 
 A simple, fast QR code generator for URLs. Enter a URL and instantly generate a QR code for it.
 
-**Live at:** https://qr.throffling.dev
+**Live at:** https://qr.throffing.dev
 
 ## Features
 
@@ -23,7 +23,7 @@ A simple, fast QR code generator for URLs. Enter a URL and instantly generate a 
    - `http://example.com` → generates QR for HTTP (not HTTPS)
 
 2. **Shareable URLs**: The app creates shareable links automatically
-   - Visit `qr.throffling.dev/google.com` to directly show the Google QR code
+   - Visit `qr.throffing.dev/google.com` to directly show the Google QR code
    - The URL updates in the browser address bar as you type
 
 3. **QR Code Output**: Get two clickable links
@@ -39,7 +39,7 @@ A simple, fast QR code generator for URLs. Enter a URL and instantly generate a 
 ## Project Structure
 
 ```
-throffling-qr/
+throffing-qr/
 ├── public/
 │   └── index.html        # Main application
 ├── functions/
