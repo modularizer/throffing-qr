@@ -1,5 +1,5 @@
 {
-  "name": "qr",
-  "compatibility_date": "2026-05-06",
-  "main": "public/_worker.js"
+  "name": "qr-edge",
+  "pages_build_output_dir": "public",
+  "compatibility_date": "2026-05-06"
 }
