@@ -60,5 +60,5 @@ Works in all modern browsers that support:
 
 ## License
 
-MIT
+Unlicense
 
